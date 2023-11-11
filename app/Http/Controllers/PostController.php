@@ -14,12 +14,13 @@ use function PHPUnit\Framework\fileExists;
 
 use App\Http\Requests\posts\StorePostRequest;
 use App\Http\Requests\posts\UpdatePostRequest;
+use Carbon\Carbon;
 
 class PostController extends Controller
 {
     function __construct()
     {
-        $this->middleware('auth')->only(['edit','destroy']);
+        $this->middleware('auth');
 
     }
     /**
@@ -27,13 +28,24 @@ class PostController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
 
-
+            $todayDate = Carbon::now()->format('Y-m-d');
             // $posts = DB::table('posts')->get();
+            $users = User::all();
+            // $posts = Post::when($request->date !=null ,function($q) use ($request){
+            //                         return $q->whereDate('created_at',$request->date);
+            //                     },function($q) use ($todayDate){
+            //                         $q->whereDate('created_at',$todayDate);
+            //                     })
+            //                     ->when($request->user_id !=null ,function($q) use ($request){
+            //                         return $q->where('user_id',$request->user_id);
+            //                     })
+
+            //                     ->paginate(4);
             $posts = Post::paginate(4);
-            return view('posts.list',['posts'=>$posts]);
+            return view('posts.list',['posts'=>$posts,'users'=>$users]);
 
     }
 
@@ -77,6 +89,7 @@ class PostController extends Controller
         $post->description = $postValidated['description'];
         $post->user_id = $postValidated['user_id'];
         $post->post_creator = $id;
+        // $post->created_at = Carbon::now()->format('Y-m-d');
         $post->save();
         return redirect()->route('posts.all')->with('success', 'Your Post has been added successfully!');
 
@@ -214,5 +227,19 @@ class PostController extends Controller
 
         $posts = Post::onlyTrashed()->paginate(3);
         return view('posts.deleted',['posts'=>$posts]);
+    }
+
+
+
+
+    public function getPostsByUser(Request $request){
+        $users = User::all();
+        $posts = Post::paginate(4);
+        if($request->ajax()){
+            $posts = Post::where('user_id',$request->user_id)->paginate(4);
+            return response()->json(['posts'=>$posts]);
+        }
+        return view('posts.list',['posts'=>$posts,'users'=>$users]);
+
     }
 }

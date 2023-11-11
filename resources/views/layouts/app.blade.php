@@ -9,7 +9,7 @@
 
     {{-- <title>{{ config('app.name', 'Laravel') }}</title> --}}
     <title>Blog-App</title>
-
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
     <link href="https://fonts.bunny.net/css?family=Nunito" rel="stylesheet">

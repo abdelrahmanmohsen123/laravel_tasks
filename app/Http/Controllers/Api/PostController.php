@@ -71,15 +71,25 @@ class PostController extends Controller
      */
     public function show(Post $post)
     {
+        if(!$post){
+           return  response()->json([
+            'success' => true,
+                'msg' => 'not found ',
+                'post' => 'not found',
+           ]);
+        };
         try{
-            $post = new PostResource($post);
+            if($post){
+                $post = new PostResource($post);
+            }
+
             return response()->json([
                 'success' => true,
                 'msg' => 'show Post ',
                 'post' => $post,
             ]);
         }catch (Exception $ex) { // Anything that went wrong
-            abort(500, $ex->getMessage());
+
         }
     }
     /**

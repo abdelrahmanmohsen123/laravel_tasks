@@ -10,8 +10,10 @@ use Carbon\Carbon;
         <div class="col-8 mb-4">
           <h2>All Products</h2>
         </div>
+
         <div class="col-4">
             <div class="row">
+
                 <div class="col-3">
                     <h3><a href="{{ route('posts.add') }}" class="btn btn-primary">Add Post</a></h3>
                 </div>
@@ -21,6 +23,59 @@ use Carbon\Carbon;
             </div>
         </div>
       </div>
+      <div class="row my-3">
+        <div class="col-6">
+            <label for="">Filter By User</label>
+            <select name="user_id" id="usersPosts" class="form-select">
+                <option value=""  selected> choose user</option>
+                @foreach ($users as $user)
+                <option value="{{$user->id}}" @if (app('request')->input('user_id') == $user->id)
+                    {{'selected'}}
+
+                @endif>
+                    {{$user->name}}
+                </option>
+                @endforeach
+
+            </select>
+        </div>
+      </div>
+      <form action="" method="get">
+
+
+        <div class="row">
+            <div class="col-3">
+                <label for="">Filter By Date</label>
+                {{-- @if (app('request')->input('date'))
+                <input type="date" value="{{ app('request')->input('date') }}" name="date" class="form-control">
+
+                @else
+                <input type="date" value="{{ date('Y-m-d') }}" name="date" class="form-control">
+                @endif --}}
+                <input type="date" value="{{ Request::get('date') ?? date('Y-m-d') }}" name="date" class="form-control">
+            </div>
+            <div class="col-3">
+                <label for="">Filter By User</label>
+                <select name="user_id" id="" class="form-select">
+                    <option value=""  selected> choose user</option>
+                    @foreach ($users as $user)
+                    <option value="{{$user->id}}" @if (app('request')->input('user_id') == $user->id)
+                        {{'selected'}}
+
+                    @endif>
+                        {{$user->name}}
+                    </option>
+                    @endforeach
+
+                </select>
+            </div>
+            <div class="col-6">
+                <br>
+                <button type="submit" class="btn btn-primary">Filter</button>
+            </div>
+        </div>
+
+    </form>
       @if (session('success'))
             <div class="col-sm-12 text-center">
                 <div class="alert  alert-success alert-dismissible fade show" role="alert">
@@ -35,7 +90,7 @@ use Carbon\Carbon;
             </div>
         </div>
     @endif
-        <table class="table table-striped my-2">
+        <table class="table table-striped table-bordered my-2  ">
             <thead>
               <tr>
                 <th scope="col">#</th>
@@ -47,7 +102,7 @@ use Carbon\Carbon;
                 <th scope="col"> slug</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody id="tbody">
 
                 @foreach ($posts as $post)
                 <tr>
@@ -149,6 +204,41 @@ use Carbon\Carbon;
                                     })
                                   });
                           })
+              </script>
+              <script>
+                $(document).ready(function(){
+                    $('#usersPosts').on('change',function(){
+                        // console.log('hi');
+                        let user_id = $(this).val();
+                        $.ajax({
+                            url: "{{route('posts.filterPosts')}}",
+                            type:"get",
+                            data:{'user_id':user_id},
+                            success:function(data){
+                                // console.log(data);
+                                let html = '';
+
+                                let posts = data.posts;
+                                if(posts.length > 0){
+                                    for (let i = 0; i < posts.length; i++) {
+                                        // const element = array[i];
+                                        html += '<tr>\
+                                                    <td>'+i+'</td>\
+                                                    <td>'+i+'</td>\
+                                                    <td>'+posts[i]['description']+'</td>\
+                                                    <td>'+posts[i]['created_at']+'</td>\
+                                                    <td>'+i+'</td>\
+                                                    </tr>';
+
+                                    }
+
+                                }
+                                $('#tbody').html(html);
+                            }
+                        })
+
+                    })
+                })
               </script>
             </tbody>
           </table>

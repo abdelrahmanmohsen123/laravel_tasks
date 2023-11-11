@@ -58,9 +58,11 @@ Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
+Route::get('filterPostsByUser',[PostController::class, 'getPostsByUser'])->name('posts.filterPosts');
+// login with git hub
 
 Route::get('/auth/redirect', function () {
-    return Socialite::driver('github')->redirect()->name('login.WithGithub');
+    return Socialite::driver('github')->redirect();
 });
 
 Route::get('/auth/callback', function () {
@@ -80,4 +82,6 @@ Route::get('/auth/callback', function () {
     Auth::login($user);
 
     return redirect('/dashboard');
+
+
 });
